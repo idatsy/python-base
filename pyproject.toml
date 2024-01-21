@@ -13,7 +13,6 @@ python = "3.11.7"
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.1.14"
 pyright = "^1.1.347"
-mypy = "^1.8.0"
 pytest = "^7.4.4"
 pytest-asyncio = "^0.23.3"
 pytest-watch = "^4.2.0"

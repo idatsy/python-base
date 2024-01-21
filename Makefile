@@ -16,12 +16,12 @@ run:
 	poetry run python -m src
 
 test: lint
+	poetry run pytest -v -n auto --dist worksteal
+
+test-time: lint:
 	poetry run pytest -n auto --dist worksteal --durations=100 > test_times.txt
 
 check: lint
-	poetry run mypy --config-file mypy.ini src/
-
-check-right: lint
 	poetry run pyright
 
 check-right-json:
