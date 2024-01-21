@@ -1,5 +1,5 @@
 .idea
-.lock
+*.lock
 .testmondata
 pyright.json
 test_times.txt
