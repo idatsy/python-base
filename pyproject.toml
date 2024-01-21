@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "base"
+version = "0.1.0"
+description = "base repository for python projects"
+authors = ["idatsy <stefan@ranvier.co.uk>"]
+readme = "README.md"
+
+
+[tool.poetry.dependencies]
+python = "3.11.7"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.1.14"
+pyright = "^1.1.347"
+mypy = "^1.8.0"
+pytest = "^7.4.4"
+pytest-asyncio = "^0.23.3"
+pytest-watch = "^4.2.0"
+pytest-testmon = "^2.1.0"
+pytest-timeout = "^2.2.0"
+pytest-xdist = "^3.5.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.pyright]
+include = ["src"]
+exclude = ["**/__pycache__"]
+
+reportMissingImports = true
+reportMissingTypeStubs = false
+
+typeCheckingMode = "strict"
+
+pythonVersion = "3.11"
+pythonPlatform = "Linux"
