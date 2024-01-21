@@ -3,3 +3,4 @@
 .testmondata
 pyright.json
 test_times.txt
+**/__pycache__/
