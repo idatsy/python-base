@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ "3.13" ]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+# Example for including private third-party packages
+#      - name: Configure Poetry
+#        run: |
+#          poetry config repositories.clickhouse-utils https://github.com/idatsy/clickhouse-utils.git
+#          poetry config http-basic.clickhouse-utils ${{ secrets.PAT_TOKEN }} x-oauth-basic
+
+      - name: Install dependencies
+        run: |
+          poetry install
+
+      - name: Lint with Ruff
+        run: |
+          poetry run ruff check .
+
+      - name: Type check with Pyright
+        run: |
+          poetry run pyright
+
+      - name: Pytest
+        run: |
+          poetry run pytest
+
+  evaluate-complexity:
+    name: Evaluate Code Complexity with Wily
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.13"
+
+      - name: Install Wily
+        run: pip install wily==1.20.0
+
+      - name: Build Wily Cache and Diff
+        id: wily
+        run: |
+          # Build the complexity cache for the target directories (adjust as needed)
+          wily build src/ tests/
+          # Compare against the base branch of the PR. Change 'origin/main' if your base branch is named differently.
+          DIFF=$(wily diff src/ tests/ --no-detail -r origin/${{ github.event.pull_request.base.ref }})
+          echo "$DIFF"
+          
+          # Escape the output for GitHub Actions multiline support
+          DIFF_ESCAPED="${DIFF//'%'/'%25'}"
+          DIFF_ESCAPED="${DIFF_ESCAPED//$'\n'/'%0A'}"
+          DIFF_ESCAPED="${DIFF_ESCAPED//$'\r'/'%0D'}"
+          echo "::set-output name=diff::$DIFF_ESCAPED"
+
+      - name: Find Current PR
+        id: findPr
+        uses: jwalton/gh-find-current-pr@v1
+
+      - name: Post Wily Complexity Comment
+        if: steps.findPr.outputs.number && steps.wily.outputs.diff != ''
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          recreate: true
+          number: ${{ steps.findPr.outputs.number }}
+          message: |
+            ```
+            ${{ steps.wily.outputs.diff }}
+            ```
+
+      - name: Post No-Change Comment
+        if: steps.findPr.outputs.number && steps.wily.outputs.diff == ''
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          recreate: true
+          number: ${{ steps.findPr.outputs.number }}
+          message: |
+            ```
+            Wily: No changes in complexity detected.
+            ```

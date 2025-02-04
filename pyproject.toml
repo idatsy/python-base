@@ -1,0 +1,124 @@
+[tool.poetry]
+name = "template"
+version = "0.1.0"
+description = "A template Python repo with Pyright, Ruff, Wily"
+authors = ["Stefan Batalka <stefan@ranvier.co.uk>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+
+#[tool.poetry.group.dev.dependencies]
+#ruff = "^0.9.4"
+#pyright = "^1.1.393"
+#wily = "^1.25.0"
+#pytest = "^8.3.4"
+#pytest-asyncio = "^0.25.3"
+#pytest-watch = "^4.2.0"
+ruff = "^0.9.4"
+pyright = "^1.1.393"
+wily = "^1.25.0"
+pytest = "^8.3.4"
+pytest-asyncio = "^0.25.3"
+pytest-watch = "^4.2.0"
+
+[tool.pyright]
+include = ["template"]
+pythonPath = "template"
+exclude = ["**/node_modules", "**/__pycache__", ".venv", ".git", "dist", "build", "_*", "**/tests", "**/gen", "**/*.ipynb", "**/wip*.py"]
+defineConstant = { DEBUG = true }
+typeCheckingMode = "standard"
+pythonVersion = "3.13"
+pythonPlatform = "All"
+stubPath = "typings"
+reportMissingImports = "error"
+reportMissingTypeStubs = false
+reportMissingModuleSource = false
+reportUnknownParameterType = "error"
+reportUnknownArgumentType = false
+reportUnknownMemberType = false
+reportMissingParameterType = "error"
+reportUnnecessaryTypeIgnoreComment = "error"
+reportUnnecessaryIsInstance = "error"
+reportImportCycles = "error"
+reportUnusedImport = "error"
+reportUnusedVariable = "error"
+reportDuplicateImport = "error"
+
+[[tool.pyright.overrides]]
+pattern = ".venv/**"
+reportUnknownParameterType = "none"
+reportUnknownArgumentType = "none"
+reportUnknownMemberType = "none"
+reportMissingParameterType = "none"
+
+[tool.ruff]
+line-length = 125
+target-version = "py313"
+
+[tool.ruff.lint]
+extend-select = [
+    # Original selections
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "F",     # pyflakes
+    "I",     # isort
+    "B",     # bugbear
+    "C4",    # comprehensions
+    "N",     # pep8-naming
+    "D",     # pydocstyle
+    "UP",    # pyupgrade
+    "S",     # security (bandit)
+
+    # Additional selections
+    "ANN",   # annotations
+    "ARG",   # arguments
+    "ERA",   # eradicate
+    "ICN",   # import conventions
+    "PD",    # pandas style
+    "NPY",   # numpy style
+    "PT",    # pytest style
+    "RET",   # return
+    "SIM",   # simplify
+    "TCH",   # type checking
+]
+ignore = [
+    "C901",  # too complex
+    "S608",  # insecure
+    "D401",  # imperative mood
+    "E501",  # line too long (handled by formatter)
+    "W291",  # trailing whitespace: fixed by ruff anyway
+]
+fixable = ["ALL"]
+unfixable = []
+
+pydocstyle = { convention = "google" }
+
+
+[tool.ruff.lint.per-file-ignores]
+"**/wip*.py" = ["ALL"]
+"**/tests/*" = ["D", "ANN", "S", "ERA"]  # Disable docstring and annotation checks for tests
+"*_" = ["D", "ANN", "S"]  # Disable docstring and annotation checks for private files
+"wip*" = ["D", "ANN", "S"]  # Disable docstring and annotation checks for work-in-progress files
+"__init__.py" = ["D"]     # Disable docstring checks for init files
+"**/gen/*" = ["ALL"]        # Disable all checks for generated files
+"**/*.ipynb" = ["ALL"]        # What happens in the notebook stays in the notebook
+
+[tool.ruff.lint.isort]
+force-single-line = false
+lines-between-types = 1
+known-first-party = []
+
+
+[tool.ruff.format]
+quote-style = "double"    # Google prefers double quotes
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+docstring-code-line-length = 125
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
