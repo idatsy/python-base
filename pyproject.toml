@@ -23,6 +23,10 @@ pytest = "^8.3.4"
 pytest-asyncio = "^0.25.3"
 pytest-watch = "^4.2.0"
 
+[tool.poetry.group.dev.dependencies]
+coverage = "^7.6.10"
+diff-cover = "^9.2.2"
+
 [tool.pyright]
 include = ["template"]
 pythonPath = "template"
