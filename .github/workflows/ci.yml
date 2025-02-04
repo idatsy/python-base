@@ -56,7 +56,7 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.ref }}
@@ -86,7 +86,9 @@ jobs:
 
       - name: Find Current PR
         id: findPr
-        uses: jwalton/gh-find-current-pr@v1
+        uses: jwalton/gh-find-current-pr@master
+        with:
+          state: open
 
       - name: Post Wily Complexity Comment
         if: steps.findPr.outputs.number && steps.wily.outputs.diff != ''
@@ -99,13 +101,124 @@ jobs:
             ${{ steps.wily.outputs.diff }}
             ```
 
-      - name: Post No-Change Comment
-        if: steps.findPr.outputs.number && steps.wily.outputs.diff == ''
+  evaluate-complexipy:
+    name: Evaluate Cognitive Complexity with complexipy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install complexipy
+        run: |
+          pip install complexipy==1.2.0
+
+      - name: Run complexipy Analysis
+        id: complexipy
+        run: |
+          OUTPUT=$(complexipy template/ tests/)
+          
+          echo "$OUTPUT"
+          
+          # Escape for multiline output in GitHub Actions
+          OUTPUT_ESCAPED="${OUTPUT//'%'/'%25'}"
+          OUTPUT_ESCAPED="${OUTPUT_ESCAPED//$'\n'/'%0A'}"
+          OUTPUT_ESCAPED="${OUTPUT_ESCAPED//$'\r'/'%0D'}"
+          echo "::set-output name=analysis::$OUTPUT_ESCAPED"
+
+      - name: Find Current PR
+        id: findPr
+        uses: jwalton/gh-find-current-pr@master
+        with:
+          state: open
+
+      - name: Post complexipy Complexity Comment
+        if: steps.findPr.outputs.number && steps.complexipy.outputs.analysis != ''
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           recreate: true
           number: ${{ steps.findPr.outputs.number }}
           message: |
+            **complexipy Cognitive Complexity Analysis**
             ```
-            Wily: No changes in complexity detected.
+            ${{ steps.complexipy.outputs.analysis }}
             ```
+  coverage-report:
+    name: Generate and Report Code Coverage
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Install dependencies (including coverage tools)
+        run: |
+          poetry install
+
+      - name: Test with Coverage
+        run: |
+          poetry run coverage run --source=template --branch -m pytest
+          poetry run coverage xml
+          
+          poetry run diff-cover coverage.xml \
+            --compare-branch=origin/${{ github.event.pull_request.base.ref }} \
+            --html-report diff_coverage.html \
+            --markdown-report diff_coverage.md
+          
+          cat diff_coverage.md
+
+      - name: Set coverage diff output
+        id: coverageDiff
+        run: |
+          DIFF=$(cat diff_coverage.md)
+          # Escape the output so we can safely pass it as a GitHub Actions output
+          DIFF_ESCAPED="${DIFF//'%'/'%25'}"
+          DIFF_ESCAPED="${DIFF_ESCAPED//$'\n'/'%0A'}"
+          DIFF_ESCAPED="${DIFF_ESCAPED//$'\r'/'%0D'}"
+          echo "::set-output name=diff::$DIFF_ESCAPED"
+
+      - name: Find Current PR
+        id: findPr
+        uses: jwalton/gh-find-current-pr@master
+        with:
+          state: open
+
+      - name: Post Coverage Comment
+        if: steps.findPr.outputs.number && steps.coverageDiff.outputs.diff != ''
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          recreate: true
+          number: ${{ steps.findPr.outputs.number }}
+          message: |
+            ${{ steps.coverageDiff.outputs.diff }}
+
+      - name: Post No Coverage Changes
+        if: steps.findPr.outputs.number && steps.coverageDiff.outputs.diff == ''
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          recreate: true
+          number: ${{ steps.findPr.outputs.number }}
+          message: |
+            No coverage changes detected for files in this PR.
