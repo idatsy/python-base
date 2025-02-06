@@ -9,23 +9,15 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.13"
 
-#[tool.poetry.group.dev.dependencies]
-#ruff = "^0.9.4"
-#pyright = "^1.1.393"
-#wily = "^1.25.0"
-#pytest = "^8.3.4"
-#pytest-asyncio = "^0.25.3"
-#pytest-watch = "^4.2.0"
+[tool.poetry.group.dev.dependencies]
+coverage = "^7.6.10"
+diff-cover = "^9.2.2"
 ruff = "^0.9.4"
 pyright = "^1.1.393"
 wily = "^1.25.0"
 pytest = "^8.3.4"
 pytest-asyncio = "^0.25.3"
 pytest-watch = "^4.2.0"
-
-[tool.poetry.group.dev.dependencies]
-coverage = "^7.6.10"
-diff-cover = "^9.2.2"
 
 [tool.pyright]
 include = ["template"]
