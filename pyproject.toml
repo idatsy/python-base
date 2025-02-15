@@ -25,7 +25,7 @@ pythonPath = "template"
 exclude = ["**/node_modules", "**/__pycache__", ".venv", ".git", "dist", "build", "_*", "**/tests", "**/gen", "**/*.ipynb", "**/wip*.py"]
 defineConstant = { DEBUG = true }
 typeCheckingMode = "standard"
-pythonVersion = "3.13"
+pythonVersion = "3.12"
 pythonPlatform = "All"
 stubPath = "typings"
 reportMissingImports = "error"
@@ -51,7 +51,7 @@ reportMissingParameterType = "none"
 
 [tool.ruff]
 line-length = 125
-target-version = "py313"
+target-version = "py312"
 
 [tool.ruff.lint]
 extend-select = [
