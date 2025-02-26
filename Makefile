@@ -41,7 +41,7 @@ clean: ## Clean build artifacts and caches
 	find . -type d -name __pycache__ -exec rm -rf {} +
 
 test: ## Run tests
-	poetry run pytest
+	poetry run pytest -p no:anchorpy
 
 stats: ## Show code quality statistics
 	@echo "=== Docstring Coverage ==="
@@ -58,10 +58,10 @@ TEST_FLAGS := -xvv -s -p no:anchorpy
 .PHONY: watch
 watch:
 	@if [ -z "$(filter-out $@,$(MAKECMDGOALS))" ]; then \
-		poetry run ptw --runner "poetry run pytest $(TEST_FLAGS) -W ignore::DeprecationWarning"; \
+		poetry run ptw --runner "poetry run pytest $(TEST_FLAGS) -W ignore::DeprecationWarning" --config "ptw.ini"; \
 	else \
 		path_arg="$(filter-out $@,$(MAKECMDGOALS))";\
-		poetry run ptw --runner "poetry run pytest tests/$$path_arg $(TEST_FLAGS) -W ignore::DeprecationWarning";\
+		poetry run ptw --runner "poetry run pytest tests/$$path_arg $(TEST_FLAGS) -W ignore::DeprecationWarning" --config "ptx.ini";\
 	fi
 
 # This pattern rule handles any additional arguments
