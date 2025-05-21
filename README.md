@@ -11,7 +11,9 @@ A minimal, conservative Python project template configured with:
 
 ## Usage
 
-- **Replace** all occurrences of "`template`" (e.g., in `pyproject.toml` and the top-level `template` directory) with your project name.
+- **Initialize the repo**: `./scripts/init_repo.sh`
+  This replaces the placeholder package name using the repository's name and
+  pushes the changes to `main`.
 - **Install dependencies**: `poetry install`
 - **Run linting**: `make lint`
 - **Run type checks**: `make typecheck`
