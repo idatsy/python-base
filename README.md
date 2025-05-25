@@ -16,8 +16,15 @@ you can focus on writing code rather than configuring your environment.
 
 ## Getting Started
 
-1. **Replace** all occurrences of `template` with your project name. This is
-   primarily in `pyproject.toml` and the `template/` package directory.
+1. **Initialize the project** by running the helper script which replaces
+   placeholder names with your project name:
+
+   ```bash
+   ./scripts/init_repo.sh
+   ```
+
+   The script infers the project name from the repository directory and updates
+   files such as `pyproject.toml`, the package directory and tests accordingly.
 2. **Install dependencies**:
 
    ```bash
