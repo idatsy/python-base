@@ -47,4 +47,3 @@ you can focus on writing code rather than configuring your environment.
 
 The included GitHub Actions workflow runs linting, type checks, unit tests and
 complexity analysis for every push and pull request.
-
