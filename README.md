@@ -47,14 +47,3 @@ you can focus on writing code rather than configuring your environment.
 
 The included GitHub Actions workflow runs linting, type checks, unit tests and
 complexity analysis for every push and pull request.
-
-## Usage
-
-- **Initialize the repo**: `./scripts/init_repo.sh`
-  This replaces the placeholder package name using the repository's name and
-  pushes the changes to `main`.
-- **Install dependencies**: `poetry install`
-- **Run linting**: `make lint`
-- **Run type checks**: `make typecheck`
-- **Run tests**: `make test`
-- **View additional commands**: `make help`
