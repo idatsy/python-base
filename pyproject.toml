@@ -93,6 +93,7 @@ ignore = [
     "D104",  # missing docstring in public package
     "D105",  # missing docstring in magic method
     "D107",  # missing docstring in __init__
+    "ANN204" # missing type annotation for special method __init__
 ]
 fixable = ["ALL"]
 unfixable = []
